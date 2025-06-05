@@ -1,4 +1,4 @@
-import os
+##### import os
 from datetime import datetime
 
 FILE_USER = "users.txt"
@@ -180,25 +180,42 @@ class ATM_system:
         print("2. Rp300.000")
         print("3. Rp500.000")
         print("4. Rp1.000.000")
-        print("5. Custom (Minimal Rp50.000)")
+        print("5. Custom (Minimal Rp50.000 dan kelipatan Rp50.000)")
 
-        nominal_map = {"1": 100_000, "2": 300_000, "3": 500_000, "4": 1_000_000}
+        nominal_map = {
+            "1": 100_000,
+            "2": 300_000,
+            "3": 500_000,
+            "4": 1_000_000
+        }
 
         while True:
-            pilihan = input("Pilih opsi (1-5): ")
+            pilihan = input("Pilih opsi (1-5): ").strip()
+            
             if pilihan in nominal_map:
                 return nominal_map[pilihan]
+            
             elif pilihan == "5":
-                try:
-                    jumlah = int(input("Masukkan jumlah: "))
+                while True:
+                    jumlah_input = input("Masukkan jumlah tarik tunai (minimal Rp50.000 dan kelipatan Rp50.000): ").strip()
+                    
+                    if not jumlah_input.isdigit():
+                        print("Input tidak valid. Masukkan angka.")
+                        continue
+                    
+                    jumlah = int(jumlah_input)
+                
                     if jumlah < 50000:
-                        print("Minimal Rp50.000. Silakan coba lagi.")
-                    else:
-                        return jumlah
-                except ValueError:
-                    print("Input tidak valid. Silakan masukkan angka.")
+                        print("Minimal penarikan adalah Rp50.000. Coba lagi.")
+                        continue
+                    if jumlah % 50000 != 0:
+                        print("Jumlah harus kelipatan Rp50.000. Coba lagi.")
+                        continue
+    
+                    return jumlah
+    
             else:
-                print("Pilihan tidak valid. Coba lagi.")
+                print("Pilihan tidak valid. Silakan pilih antara 1 hingga 5.")
 
     def setor_sendiri(self, user):
         try:
