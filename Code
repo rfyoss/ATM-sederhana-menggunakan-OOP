@@ -1,4 +1,4 @@
-import os
+# import os
 from datetime import datetime
 
 FILE_USER = "users.txt"
@@ -73,7 +73,7 @@ class UserManager:
         if "|" in username or username in self.users:
             print("Username tidak valid atau sudah digunakan.")
             return
-        pin = input("Masukkan PIN baru (6 digit): ")
+        pin = input("Masukkan PIN baru (6 digit angka): ")
         if not pin.isdigit() or len(pin) != 6:
             print("PIN harus 6 digit angka.")
             return
@@ -114,7 +114,8 @@ class ATM_system:
         print("2. Tarik Tunai")
         print("3. Setor Tunai")
         print("4. Lihat Riwayat")
-        print("5. Logout")
+        print("5. Ganti PIN")
+        print("6. Logout")
 
     def input_tarik(self):
         print("\nNominal Tarik Tunai:")
@@ -140,7 +141,6 @@ class ATM_system:
             elif pilihan == "5":
                 while True:
                     jumlah_input = input("Masukkan jumlah tarik tunai (minimal Rp50.000 dan kelipatan Rp50.000): ").strip()
-
                     if not jumlah_input.isdigit():
                         print("Input tidak valid. Masukkan angka.")
                         continue
@@ -155,7 +155,6 @@ class ATM_system:
                         continue
 
                     return jumlah
-
             else:
                 print("Pilihan tidak valid. Silakan pilih antara 1 hingga 5.")
 
@@ -209,10 +208,37 @@ class ATM_system:
         except FileNotFoundError:
             print("Belum ada riwayat transaksi.")
 
+    def ganti_pin(self, user):
+        print("\n=== GANTI PIN ===")
+        for attempt in range(3):
+            pin_lama = input("Masukkan PIN lama: ")
+            if pin_lama != user.pin:
+                print(f"PIN salah. Percobaan tersisa: {2 - attempt}")
+            else:
+                break
+        else:
+            print("Gagal verifikasi PIN lama.")
+            return
+
+        while True:
+            pin_baru = input("Masukkan PIN baru (6 digit angka): ")
+            if not pin_baru.isdigit() or len(pin_baru) != 6:
+                print("PIN harus 6 digit angka.")
+                continue
+            konfirmasi = input("Konfirmasi PIN baru: ")
+            if pin_baru != konfirmasi:
+                print("PIN konfirmasi tidak cocok.")
+                continue
+            break
+
+        user.pin = pin_baru
+        self.user_manager.save_users()
+        print("PIN berhasil diubah.")
+
     def menu_user(self, user):
         while True:
             self.tampilkan_menu()
-            pilihan = input("Pilih menu (1-5): ")
+            pilihan = input("Pilih menu (1-6): ")
 
             if pilihan == "1":
                 print(f"Saldo Anda: Rp{user.cek_saldo():,}")
@@ -242,8 +268,12 @@ class ATM_system:
                 self.tampilkan_riwayat(user)
 
             elif pilihan == "5":
+                self.ganti_pin(user)
+
+            elif pilihan == "6":
                 print("Logout.")
                 break
+
             else:
                 print("Pilihan tidak valid.")
 
